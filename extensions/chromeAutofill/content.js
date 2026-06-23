@@ -30,6 +30,30 @@ let profile = null;
 let activePopover = null;
 let iconCounter = 0;
 
+// input → icon
+const iconMap = new Map();
+
+const sharedIntersectionObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+        const icon = iconMap.get(entry.target);
+        if (!icon) continue;
+        if (entry.isIntersecting) {
+            positionIcon(entry.target, icon);
+            icon.style.display = 'block';
+        } else {
+            icon.style.display = 'none';
+        }
+    }
+}, { threshold: 0 });
+
+function repositionAll() {
+    for (const [input, icon] of iconMap) {
+        if (icon.style.display !== 'none') positionIcon(input, icon);
+    }
+}
+window.addEventListener('scroll', repositionAll, { passive: true });
+window.addEventListener('resize', repositionAll, { passive: true });
+
 // Load profile from storage and inject
 chrome.storage.local.get(STORAGE_KEY, (result) => {
     if (result[STORAGE_KEY]) {
@@ -58,13 +82,13 @@ function injectAll() {
 }
 
 function removeAll() {
-    document
-    .querySelectorAll('[data-flash-icon]')
-    .forEach((el) => el.remove());
+    document.querySelectorAll('[data-flash-icon]').forEach((el) => el.remove());
     document.querySelectorAll(`[${ATTR}]`).forEach((el) => {
         el.style.paddingRight = '';
         el.removeAttribute(ATTR);
     });
+    for (const input of iconMap.keys()) sharedIntersectionObserver.unobserve(input);
+    iconMap.clear();
 }
 
 let observer = null;
@@ -119,9 +143,8 @@ function injectIcon(input) {
     positionIcon(input, icon);
     document.body.appendChild(icon);
 
-    const reposition = () => positionIcon(input, icon);
-    window.addEventListener('scroll', reposition, { passive: true });
-    window.addEventListener('resize', reposition, { passive: true });
+    iconMap.set(input, icon);
+    sharedIntersectionObserver.observe(input);
 }
 
 function positionIcon(input, icon) {
@@ -152,7 +175,11 @@ function showPopover(input, anchor) {
     const pop = document.createElement('div');
     pop.setAttribute('data-flash-popover', '');
     pop.style.cssText = `
-    position: absolute;
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
     z-index: 2147483647;
     background: #111111;
     border: 1px solid rgba(255,255,255,0.1);
@@ -167,7 +194,7 @@ function showPopover(input, anchor) {
   `;
 
     if (entries.length === 0) {
-        pop.innerHTML = `<div style="padding:8px 10px;color:#71717a;font-size:11px;">Немає даних профілю</div>`;
+        pop.innerHTML = `<div style="padding:8px 10px;color:#cacaca;font-size:11px;">Немає даних профілю</div>`;
     } else {
         entries.forEach(({ label, value, field }) => {
             const row = document.createElement('div');
@@ -188,7 +215,7 @@ function showPopover(input, anchor) {
             });
 
             const labelEl = document.createElement('span');
-            labelEl.style.cssText = `color:${isGuessed ? '#ffffff' : '#71717a'};font-size:10px;width:68px;flex-shrink:0;`;
+            labelEl.style.cssText = `color:${isGuessed ? '#ffffff' : '#cacaca'};font-size:10px;width:68px;flex-shrink:0;`;
             labelEl.textContent = label;
 
             const valEl = document.createElement('span');
@@ -207,9 +234,9 @@ function showPopover(input, anchor) {
         });
     }
 
-    document.body.appendChild(pop);
+    document.documentElement.appendChild(pop);
     activePopover = pop;
-    positionPopover(anchor, pop);
+    requestAnimationFrame(() => positionPopover(anchor, pop));
 
     setTimeout(() => {
         document.addEventListener('click', closePopover, { once: true });
@@ -217,19 +244,24 @@ function showPopover(input, anchor) {
 }
 
 function positionPopover(anchor, pop) {
+    const MARGIN = 8;
     const rect = anchor.getBoundingClientRect();
-    const scrollY = window.scrollY;
-    const scrollX = window.scrollX;
+    const popW = pop.offsetWidth;
+    const popH = pop.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
-    let top = rect.bottom + scrollY + 4;
-    let left = rect.left + scrollX;
+    let top = rect.bottom + 4;
+    if (top + popH + MARGIN > vh) top = rect.top - popH - 4;
+    top = Math.max(MARGIN, Math.min(top, vh - popH - MARGIN));
 
-    if (rect.bottom + pop.offsetHeight + 4 > window.innerHeight) {
-        top = rect.top + scrollY - pop.offsetHeight - 4;
-    }
+    let left = rect.left;
+    left = Math.max(MARGIN, Math.min(left, vw - popW - MARGIN));
 
     pop.style.top = `${top}px`;
     pop.style.left = `${left}px`;
+    pop.style.opacity = '1';
+    pop.style.pointerEvents = 'auto';
 }
 
 function closePopover() {

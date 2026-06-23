@@ -29,13 +29,12 @@ export default function App() {
                             </h2>
                             <div className="flex items-center gap-2">
                                 <Button
-                                    variant="outline"
                                     size="sm"
                                     onClick={() => selectedConsumer.exportToExcel(profiles)}
                                 >
                                     Експорт в Excel
                                 </Button>
-                                <Button variant="ghost" size="sm" onClick={clearProfiles}>
+                                <Button variant="danger" size="sm" onClick={clearProfiles}>
                                     Очистити
                                 </Button>
                             </div>

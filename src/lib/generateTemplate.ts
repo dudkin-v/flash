@@ -1,43 +1,45 @@
 import * as XLSX from 'xlsx';
 
-const COLUMNS = [
-    'name',
-    'group_id',
-    'domain_name',
-    'username',
-    'password',
-    'cookie',
-    'proxy_type',
-    'proxy_host',
-    'proxy_port',
-    'proxy_user',
-    'proxy_password',
-    'remark',
+const SOURCE_COLUMNS = [
+    'Name',
+    'BD',
+    'SSN',
+    'Address',
+    'Address 2',
+    'Address 3',
+    'Address 4',
+    'Phone',
+    'Phone 2',
+    'Phone 3',
+    'Email',
+    'Email 2',
+    'Email 3',
 ];
 
-const EXAMPLE_ROW = {
-    name: 'Profile 1',
-    group_id: '0',
-    domain_name: 'facebook.com',
-    username: 'user@example.com',
-    password: 'mypassword',
-    cookie: '',
-    proxy_type: 'http',
-    proxy_host: '123.0.0.1',
-    proxy_port: '8080',
-    proxy_user: 'proxyuser',
-    proxy_password: 'proxypass',
-    remark: 'Примечание',
+const SOURCE_EXAMPLE_ROW = {
+    Name: 'John Smith',
+    BD: '1990-05-15',
+    SSN: '123456789',
+    Address: '123 Main St',
+    'Address 2': 'Apt 4B',
+    'Address 3': 'CA',
+    'Address 4': '',
+    Phone: '2104224720',
+    'Phone 2': '',
+    'Phone 3': '',
+    Email: 'john.smith@example.com',
+    'Email 2': '',
+    'Email 3': '',
 };
 
-export function downloadTemplate() {
-    const ws = XLSX.utils.json_to_sheet([EXAMPLE_ROW], { header: COLUMNS });
+export function downloadSourceTemplate() {
+    const ws = XLSX.utils.json_to_sheet([SOURCE_EXAMPLE_ROW], { header: SOURCE_COLUMNS });
 
-    ws['!cols'] = COLUMNS.map((col) => ({
-        wch: Math.max(col.length + 4, 16),
+    ws['!cols'] = SOURCE_COLUMNS.map((col) => ({
+        wch: Math.max(col.length + 4, 18),
     }));
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Profiles');
-    XLSX.writeFile(wb, 'adspower_template.xlsx');
+    XLSX.utils.book_append_sheet(wb, ws, 'Source');
+    XLSX.writeFile(wb, 'source_template.xlsx');
 }

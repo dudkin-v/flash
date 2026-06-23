@@ -33,14 +33,16 @@ export interface ProfileConfig {
 }
 
 export interface SourceRow {
+    Name: string;
     BD: string;
     SSN: string;
-    NAME: string;
     Address: string;
     'Address 2': string;
     'Address 3': string;
     'Address 4': string;
     Phone: string;
+    'Phone 2': string;
+    'Phone 3': string;
     Email: string;
     'Email 2': string;
     'Email 3': string;

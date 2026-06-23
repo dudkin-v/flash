@@ -104,8 +104,10 @@ export function ProfilesTable<T extends BaseProfile>({
 
                                 const isEmpty = strVal === '';
                                 const statusColor =
-                                    col.key === 'status' && consumer.statusColors
-                                        ? (consumer.statusColors[strVal] ?? 'text-zinc-600')
+                                    col.key === 'status' &&
+                                    consumer.statusColors
+                                        ? (consumer.statusColors[strVal] ??
+                                          'text-zinc-600')
                                         : null;
 
                                 const textClass = statusColor
@@ -122,7 +124,11 @@ export function ProfilesTable<T extends BaseProfile>({
                                             <Select
                                                 value={strVal}
                                                 onValueChange={(val) =>
-                                                    commitSelect(profile.id, col.key, val)
+                                                    commitSelect(
+                                                        profile.id,
+                                                        col.key,
+                                                        val
+                                                    )
                                                 }
                                             >
                                                 <SelectTrigger
@@ -135,8 +141,13 @@ export function ProfilesTable<T extends BaseProfile>({
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {col.options?.map((opt) => (
-                                                        <SelectItem key={opt} value={opt}>
-                                                            {opt === '' ? '—' : opt}
+                                                        <SelectItem
+                                                            key={opt}
+                                                            value={opt}
+                                                        >
+                                                            {opt === ''
+                                                                ? '—'
+                                                                : opt}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -153,8 +164,10 @@ export function ProfilesTable<T extends BaseProfile>({
                                                 defaultValue={strVal}
                                                 onBlur={commitEdit}
                                                 onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') commitEdit();
-                                                    if (e.key === 'Escape') cancelEdit();
+                                                    if (e.key === 'Enter')
+                                                        commitEdit();
+                                                    if (e.key === 'Escape')
+                                                        cancelEdit();
                                                 }}
                                                 className={[
                                                     'w-full bg-zinc-800 border border-white/20 rounded px-2 py-0.5',
@@ -180,7 +193,8 @@ export function ProfilesTable<T extends BaseProfile>({
                                             .filter(Boolean)
                                             .join(' ')}
                                         onClick={() => {
-                                            if (col.editable) startEdit(profile.id, col.key);
+                                            if (col.editable)
+                                                startEdit(profile.id, col.key);
                                         }}
                                     >
                                         {strVal || '—'}
@@ -191,17 +205,22 @@ export function ProfilesTable<T extends BaseProfile>({
                                 <div className="flex items-center gap-1">
                                     <button
                                         onClick={() => copyProfile(profile)}
-                                        className="p-1.5 rounded text-zinc-600 hover:text-zinc-300 hover:bg-white/5 transition-colors"
+                                        className="p-1.5 rounded text-zinc-600 hover:text-zinc-300 hover:bg-white/5 transition-colors cursor-pointer"
                                     >
                                         {copiedId === profile.id ? (
-                                            <Check size={14} className="text-green-400" />
+                                            <Check
+                                                size={14}
+                                                className="text-green-400"
+                                            />
                                         ) : (
                                             <Copy size={14} />
                                         )}
                                     </button>
                                     <button
-                                        onClick={() => deleteProfile(profile.id)}
-                                        className="p-1.5 rounded text-zinc-600 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                                        onClick={() =>
+                                            deleteProfile(profile.id)
+                                        }
+                                        className="p-1.5 rounded text-zinc-600 hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
                                     >
                                         <Trash2 size={14} />
                                     </button>

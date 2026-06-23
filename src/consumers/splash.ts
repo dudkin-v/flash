@@ -169,10 +169,10 @@ export const splashConsumer: Consumer<SplashProfile> = {
 
     transform(rows: SourceRow[]): SplashProfile[] {
         return rows
-            .filter((row) => row.NAME?.trim())
+            .filter((row) => row.Name?.trim())
             .map((row, index) => {
                 const n = index + 1;
-                const { firstName, lastName } = parseName(row.NAME);
+                const { firstName, lastName } = parseName(row.Name);
                 const bd = row.BD?.trim() ?? '';
                 const { year, month, day } = splitBD(bd);
 
@@ -188,8 +188,8 @@ export const splashConsumer: Consumer<SplashProfile> = {
                     address: buildAddress(row),
                     state: row['Address 3']?.trim() ?? '',
                     ssn: row.SSN?.trim() ?? '',
-                    phone: row.Phone?.trim() ?? '',
-                    email: row.Email?.trim() ?? '',
+                    phone: [row.Phone, row['Phone 2'], row['Phone 3']].map((p) => p?.trim()).find(Boolean) ?? '',
+                    email: [row.Email, row['Email 2'], row['Email 3']].map((e) => e?.trim()).find(Boolean) ?? '',
                     password: generatePassword(n),
                     adsPower: '',
                     promoCode: '',
