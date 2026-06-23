@@ -32,5 +32,11 @@
       "resources": ["icons/icon.svg"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "flash-autofill@flash.app",
+      "strict_min_version": "109.0"
+    }
+  }
 }

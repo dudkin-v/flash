@@ -1,4 +1,5 @@
-const ICON_URL = chrome.runtime.getURL('icons/icon.svg');
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+const ICON_URL = browserAPI.runtime.getURL('icons/icon.svg');
 const ATTR = 'data-flash-id';
 const ICON_SIZE = 18;
 const ICON_MARGIN = 6;
@@ -55,7 +56,7 @@ window.addEventListener('scroll', repositionAll, { passive: true });
 window.addEventListener('resize', repositionAll, { passive: true });
 
 // Load profile from storage and inject
-chrome.storage.local.get(STORAGE_KEY, (result) => {
+browserAPI.storage.local.get(STORAGE_KEY, (result) => {
     if (result[STORAGE_KEY]) {
         profile = result[STORAGE_KEY];
         injectAll();
@@ -63,7 +64,7 @@ chrome.storage.local.get(STORAGE_KEY, (result) => {
 });
 
 // Re-inject when profile changes from popup
-chrome.storage.onChanged.addListener((changes, area) => {
+browserAPI.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local' || !changes[STORAGE_KEY]) return;
     profile = changes[STORAGE_KEY].newValue ?? null;
     if (profile) injectAll();

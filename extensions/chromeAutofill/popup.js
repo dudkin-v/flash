@@ -5,9 +5,11 @@ const resultEl = document.getElementById('result');
 const btnClear = document.getElementById('btn-clear');
 const toast = document.getElementById('toast');
 
+const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+
 let profile = null;
 
-chrome.storage.local.get(STORAGE_KEY, (result) => {
+browserAPI.storage.local.get(STORAGE_KEY, (result) => {
     const saved = result[STORAGE_KEY];
     if (saved) {
         jsonInput.value = JSON.stringify(saved, null, 2);
@@ -26,7 +28,7 @@ btnClear.addEventListener('click', () => {
     fieldsEl.classList.remove('visible');
     errorEl.classList.remove('visible');
     resultEl.classList.remove('visible');
-    chrome.storage.local.remove(STORAGE_KEY);
+    browserAPI.storage.local.remove(STORAGE_KEY);
 });
 
 function parseInput(text) {
@@ -42,7 +44,7 @@ function parseInput(text) {
 
     try {
         profile = JSON.parse(text);
-        chrome.storage.local.set({ [STORAGE_KEY]: profile });
+        browserAPI.storage.local.set({ [STORAGE_KEY]: profile });
         renderFields(profile);
     } catch {
         errorEl.textContent = 'Невірний JSON';
