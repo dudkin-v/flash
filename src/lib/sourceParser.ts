@@ -10,11 +10,10 @@ export function parseSourceSheet(file: File): Promise<SourceRow[]> {
                 const data = new Uint8Array(e.target!.result as ArrayBuffer);
                 const workbook = XLSX.read(data, { type: 'array' });
 
-                const sheetName = workbook.SheetNames.find(
-                    (n) => n.toLowerCase() === 'source'
-                );
+                const sheetName = workbook.SheetNames[0];
+
                 if (!sheetName) {
-                    return reject(new Error('Лист "source" не найден в файле'));
+                    return reject(new Error('Лист не знайдений у файлі'));
                 }
 
                 const sheet = workbook.Sheets[sheetName];
@@ -23,7 +22,7 @@ export function parseSourceSheet(file: File): Promise<SourceRow[]> {
                 });
 
                 if (rows.length === 0) {
-                    return reject(new Error('Лист "source" пустой'));
+                    return reject(new Error('Лист порожній'));
                 }
 
                 resolve(rows);
@@ -32,7 +31,7 @@ export function parseSourceSheet(file: File): Promise<SourceRow[]> {
             }
         };
 
-        reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
+        reader.onerror = () => reject(new Error('Не вдалося прочитати файл'));
         reader.readAsArrayBuffer(file);
     });
 }
