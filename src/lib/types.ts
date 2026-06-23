@@ -1,3 +1,37 @@
+export interface CreateProfileResult {
+    row: number;
+    name: string;
+    success: boolean;
+    profileId?: string;
+    error?: string;
+}
+
+export interface ProfileConfig {
+    name: string;
+    group_id: string;
+    domain_name?: string;
+    username?: string;
+    password?: string;
+    cookie?: string;
+    remark?: string;
+    fingerprint_config: {
+        automatic_timezone: string;
+        language: string[];
+        flash: string;
+        fonts: string[];
+        webrtc: string;
+        ua: string;
+    };
+    user_proxy_config?: {
+        proxy_soft: string;
+        proxy_type: string;
+        proxy_host: string;
+        proxy_port: string;
+        proxy_user: string;
+        proxy_password: string;
+    };
+}
+
 export interface SourceRow {
     BD: string;
     SSN: string;
