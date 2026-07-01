@@ -5,26 +5,26 @@ const ICON_SIZE = 18;
 const ICON_MARGIN = 6;
 
 const FIELD_PATTERNS = [
-    { field: 'fullName', tests: [/full.?name/i, /fname/i, /given.?name/i] },
-    { field: 'firstName', tests: [/first.?name/i, /fname/i, /given.?name/i] },
+    { field: 'Full Name', tests: [/full.?name/i, /fname/i, /given.?name/i] },
+    { field: 'First Name', tests: [/first.?name/i, /fname/i, /given.?name/i] },
     {
-        field: 'lastName',
+        field: 'Last Name',
         tests: [/last.?name/i, /lname/i, /family.?name/i, /surname/i],
     },
-    { field: 'email', tests: [/email/i] },
-    { field: 'password', tests: [/password/i, /passwd/i] },
-    { field: 'phone', tests: [/phone/i, /tel(ephone)?/i, /mobile/i] },
-    { field: 'address', tests: [/address/i, /street/i] },
-    { field: 'ssn', tests: [/ssn/i, /social.?security/i] },
+    { field: 'Email', tests: [/email/i] },
+    { field: 'Password', tests: [/password/i, /passwd/i] },
+    { field: 'Phone', tests: [/phone/i, /tel(ephone)?/i, /mobile/i] },
+    { field: 'Address', tests: [/address/i, /street/i] },
+    { field: 'SSN', tests: [/ssn/i, /social.?security/i] },
     {
-        field: 'bd',
+        field: 'BD',
         tests: [/\bdob\b/i, /birth.?date/i, /date.?of.?birth/i, /birthday/i],
     },
-    { field: 'bdYear', tests: [/birth.?year/i, /\byear\b/i] },
-    { field: 'bdMonth', tests: [/birth.?month/i, /\bmonth\b/i] },
-    { field: 'bdDay', tests: [/birth.?day/i, /\bday\b/i] },
-    { field: 'state', tests: [/\bstate\b/i] },
-    { field: 'promoCode', tests: [/promo/i, /coupon/i] },
+    { field: 'BD Year', tests: [/birth.?year/i, /\byear\b/i] },
+    { field: 'BD Month', tests: [/birth.?month/i, /\bmonth\b/i] },
+    { field: 'BD Day', tests: [/birth.?day/i, /\bday\b/i] },
+    { field: 'State', tests: [/\bstate\b/i] },
+    { field: 'Promo Code', tests: [/promo/i, /coupon/i] },
 ];
 
 let profile = null;
@@ -285,9 +285,9 @@ function guessField(input) {
     for (const { field, tests } of FIELD_PATTERNS) {
         if (tests.some((re) => re.test(attrs))) return field;
     }
-    if (input.type === 'email') return 'email';
-    if (input.type === 'password') return 'password';
-    if (input.type === 'tel') return 'phone';
+    if (input.type === 'email') return 'Email';
+    if (input.type === 'password') return 'Password';
+    if (input.type === 'tel') return 'Phone';
     return null;
 }
 

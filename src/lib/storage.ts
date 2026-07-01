@@ -1,30 +1,32 @@
-import type { BaseProfile } from './types';
+import type { DynamicRow } from './types';
 
-const PREFIX = 'adspower_profiles_';
+const ROWS_KEY = 'flash_rows';
+const COLUMNS_KEY = 'flash_columns';
 
-export function saveProfiles(
-    consumerKey: string,
-    profiles: BaseProfile[]
-): void {
+export function saveData(rows: DynamicRow[], columns: string[]): void {
     try {
-        localStorage.setItem(PREFIX + consumerKey, JSON.stringify(profiles));
+        localStorage.setItem(ROWS_KEY, JSON.stringify(rows));
+        localStorage.setItem(COLUMNS_KEY, JSON.stringify(columns));
     } catch {
         // localStorage quota exceeded — silently ignore
     }
 }
 
-export function loadProfiles<T extends BaseProfile>(
-    consumerKey: string
-): T[] | null {
+export function loadData(): { rows: DynamicRow[]; columns: string[] } | null {
     try {
-        const raw = localStorage.getItem(PREFIX + consumerKey);
-        if (!raw) return null;
-        return JSON.parse(raw) as T[];
+        const rawRows = localStorage.getItem(ROWS_KEY);
+        const rawCols = localStorage.getItem(COLUMNS_KEY);
+        if (!rawRows || !rawCols) return null;
+        return {
+            rows: JSON.parse(rawRows) as DynamicRow[],
+            columns: JSON.parse(rawCols) as string[],
+        };
     } catch {
         return null;
     }
 }
 
-export function clearProfiles(consumerKey: string): void {
-    localStorage.removeItem(PREFIX + consumerKey);
+export function clearData(): void {
+    localStorage.removeItem(ROWS_KEY);
+    localStorage.removeItem(COLUMNS_KEY);
 }

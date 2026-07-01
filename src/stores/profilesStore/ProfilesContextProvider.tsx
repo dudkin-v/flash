@@ -1,46 +1,35 @@
 import { useState, useCallback, useMemo, type PropsWithChildren } from 'react';
-import {
-    saveProfiles,
-    loadProfiles,
-    clearProfiles as clearProfilesStorage,
-} from '../../lib/storage';
-import { useConsumerContext } from '../consumerStore';
 import { ProfilesContext } from './profilesContext';
-import type { BaseProfile } from '../../lib/types';
+import { saveData, loadData, clearData as clearStorage } from '../../lib/storage';
+import type { DynamicRow } from '../../lib/types';
+
+function init(): { rows: DynamicRow[]; columns: string[] } {
+    return loadData() ?? { rows: [], columns: [] };
+}
 
 export function ProfilesContextProvider({ children }: PropsWithChildren) {
-    const { selectedConsumer } = useConsumerContext();
+    const [{ rows, columns }, setState] = useState(init);
 
-    const [activeKey, setActiveKey] = useState(selectedConsumer?.key);
-    const [profiles, setProfiles] = useState<BaseProfile[]>(() =>
-        selectedConsumer ? (loadProfiles<BaseProfile>(selectedConsumer.key) ?? []) : []
-    );
+    const loadDataCtx = useCallback((newRows: DynamicRow[], newColumns: string[]) => {
+        setState({ rows: newRows, columns: newColumns });
+        saveData(newRows, newColumns);
+    }, []);
 
-    if (selectedConsumer?.key !== activeKey) {
-        setActiveKey(selectedConsumer?.key);
-        setProfiles(
-            selectedConsumer ? (loadProfiles<BaseProfile>(selectedConsumer.key) ?? []) : []
-        );
-    }
+    const updateRows = useCallback((newRows: DynamicRow[]) => {
+        setState((prev) => {
+            saveData(newRows, prev.columns);
+            return { rows: newRows, columns: prev.columns };
+        });
+    }, []);
 
-    const updateProfiles = useCallback(
-        (next: BaseProfile[]) => {
-            if (!selectedConsumer) return;
-            setProfiles(next);
-            saveProfiles(selectedConsumer.key, next);
-        },
-        [selectedConsumer]
-    );
-
-    const clearProfiles = useCallback(() => {
-        if (!selectedConsumer) return;
-        clearProfilesStorage(selectedConsumer.key);
-        setProfiles([]);
-    }, [selectedConsumer]);
+    const clearDataCtx = useCallback(() => {
+        clearStorage();
+        setState({ rows: [], columns: [] });
+    }, []);
 
     const value = useMemo(
-        () => ({ profiles, updateProfiles, clearProfiles }),
-        [profiles, updateProfiles, clearProfiles]
+        () => ({ rows, columns, loadData: loadDataCtx, updateRows, clearData: clearDataCtx }),
+        [rows, columns, loadDataCtx, updateRows, clearDataCtx]
     );
 
     return <ProfilesContext.Provider value={value}>{children}</ProfilesContext.Provider>;

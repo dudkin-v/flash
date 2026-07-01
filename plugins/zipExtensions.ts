@@ -9,7 +9,7 @@ export function zipExtensions(): Plugin {
         buildStart() {
             const root = resolve(__dirname, '..');
             const outDir = resolve(root, 'public/downloads');
-            const extDir = resolve(root, 'extensions/chromeAutofill');
+            const extDir = resolve(root, 'extensions/autofill');
 
             if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 

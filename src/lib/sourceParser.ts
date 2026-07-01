@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
-import type { SourceRow } from './types';
+import type { DynamicRow } from './types';
 
-export function parseSourceSheet(file: File): Promise<SourceRow[]> {
+export function parseSourceSheet(file: File): Promise<DynamicRow[]> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -17,8 +17,9 @@ export function parseSourceSheet(file: File): Promise<SourceRow[]> {
                 }
 
                 const sheet = workbook.Sheets[sheetName];
-                const rows = XLSX.utils.sheet_to_json<SourceRow>(sheet, {
+                const rows = XLSX.utils.sheet_to_json<DynamicRow>(sheet, {
                     defval: '',
+                    raw: false,
                 });
 
                 if (rows.length === 0) {

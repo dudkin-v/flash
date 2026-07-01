@@ -1,19 +1,11 @@
-import { useConsumerContext } from '../../stores/consumerStore';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { DropdownMenu } from '../ui/DropdownMenu';
-import { consumers } from '../../consumers';
-
-const extensions = [
-    { label: 'Flash Autofill (Chrome)', file: '/downloads/flash-autofill.zip' },
-];
+import { FileDown } from 'lucide-react';
+import { Button } from '../ui/Button';
 
 export function Header() {
-    const { selectedConsumer, selectConsumer } = useConsumerContext();
-
-    function downloadExtension(file: string, label: string) {
+    function downloadExtension() {
         const a = document.createElement('a');
-        a.href = file;
-        a.download = label;
+        a.href = '/downloads/flash-autofill.zip';
+        a.download = 'Flash Autofill';
         a.click();
     }
 
@@ -24,30 +16,10 @@ export function Header() {
                     <img src="/favicon.svg" className="w-6 h-6" alt="Flash logo" />
                     <h1 className="text-base font-semibold text-white">Flash</h1>
                 </div>
-                <div className="flex items-center gap-3">
-                    <DropdownMenu
-                        label="Завантажити розширення"
-                        items={extensions.map((ext) => ({
-                            label: ext.label,
-                            onClick: () => downloadExtension(ext.file, ext.label),
-                        }))}
-                    />
-                    <Select
-                        value={selectedConsumer?.key}
-                        onValueChange={selectConsumer}
-                    >
-                        <SelectTrigger className="w-56">
-                            Сайт: <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {consumers.map((consumer) => (
-                                <SelectItem key={consumer.key} value={consumer.key}>
-                                    {consumer.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <Button size="sm" variant="primary" onClick={downloadExtension}>
+                    <FileDown className="size-4" />
+                    Розширення
+                </Button>
             </div>
         </header>
     );

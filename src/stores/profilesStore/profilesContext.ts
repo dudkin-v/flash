@@ -1,14 +1,18 @@
 import { createContext } from 'react';
-import type { BaseProfile } from '../../lib/types';
+import type { DynamicRow } from '../../lib/types';
 
 export interface ProfilesContextValue {
-    profiles: BaseProfile[];
-    updateProfiles: (profiles: BaseProfile[]) => void;
-    clearProfiles: () => void;
+    rows: DynamicRow[];
+    columns: string[];
+    loadData: (rows: DynamicRow[], columns: string[]) => void;
+    updateRows: (rows: DynamicRow[]) => void;
+    clearData: () => void;
 }
 
 export const ProfilesContext = createContext<ProfilesContextValue>({
-    profiles: [],
-    updateProfiles: () => {},
-    clearProfiles: () => {},
+    rows: [],
+    columns: [],
+    loadData: () => {},
+    updateRows: () => {},
+    clearData: () => {},
 });

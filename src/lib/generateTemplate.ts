@@ -10,10 +10,8 @@ const SOURCE_COLUMNS = [
     'Address 4',
     'Phone',
     'Phone 2',
-    'Phone 3',
     'Email',
     'Email 2',
-    'Email 3',
 ];
 
 const SOURCE_EXAMPLE_ROW = {
@@ -26,10 +24,8 @@ const SOURCE_EXAMPLE_ROW = {
     'Address 4': '',
     Phone: '2104224720',
     'Phone 2': '',
-    'Phone 3': '',
     Email: 'john.smith@example.com',
     'Email 2': '',
-    'Email 3': '',
 };
 
 export function downloadSourceTemplate() {

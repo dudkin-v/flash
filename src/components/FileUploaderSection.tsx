@@ -2,65 +2,84 @@ import { useState } from 'react';
 import { FileDown } from 'lucide-react';
 import { Button } from './ui/Button.tsx';
 import { ExcelUploader } from './ExcelUploader';
+import { PasswordModal } from './PasswordModal';
 import { PromoModal } from './PromoModal';
 import { parseSourceSheet } from '../lib/sourceParser';
+import { transformRows } from '../lib/transform';
 import { downloadSourceTemplate } from '../lib/generateTemplate';
-import { useConsumerContext } from '../stores/consumerStore';
 import { useProfilesContext } from '../stores/profilesStore';
-import type { BaseProfile } from '../lib/types';
+import type { DynamicRow } from '../lib/types';
+
+type PendingData = { rows: DynamicRow[]; columns: string[] };
 
 export function FileUploaderSection() {
-    const { selectedConsumer } = useConsumerContext();
-    const { updateProfiles } = useProfilesContext();
+    const { loadData } = useProfilesContext();
     const [fileError, setFileError] = useState<string | null>(null);
-    const [pendingProfiles, setPendingProfiles] = useState<BaseProfile[] | null>(null);
+    const [stage, setStage] = useState<'idle' | 'password' | 'promo'>('idle');
+    const [pendingData, setPendingData] = useState<PendingData | null>(null);
 
     function handleFile(file: File) {
-        if (!selectedConsumer) return;
         setFileError(null);
-
         parseSourceSheet(file)
-            .then((rows) => {
-                const profiles = selectedConsumer.transform(rows);
-                if (profiles.length === 0) {
-                    throw new Error('Не вдалося розпізнати дані. Перевірте заголовки колонок у файлі');
+            .then((sourceRows) => {
+                const { rows, columns } = transformRows(sourceRows);
+                if (rows.length === 0) {
+                    throw new Error(
+                        'Не вдалося розпізнати дані. Перевірте заголовки колонок у файлі'
+                    );
                 }
-                if (selectedConsumer.promoModal) {
-                    setPendingProfiles(profiles);
-                } else {
-                    updateProfiles(profiles);
+                if (rows.length > 100) {
+                    throw new Error(
+                        `Файл містить ${rows.length} профілів. Максимально допустимо 100`
+                    );
                 }
+                setPendingData({ rows, columns });
+                setStage('password');
             })
             .catch((err: Error) => setFileError(err.message));
     }
 
+    function handlePasswordConfirm(passwords: string[]) {
+        if (!pendingData) return;
+        const rows = pendingData.rows.map((row, i) => ({
+            ...row,
+            'Password': passwords[i] ?? row['Password'],
+        }));
+        setPendingData({ ...pendingData, rows });
+        setStage('promo');
+    }
+
+    function handlePasswordCancel() {
+        setPendingData(null);
+        setStage('idle');
+    }
+
     function handlePromoConfirm(promoCodes: string[]) {
-        if (!selectedConsumer?.promoModal || !pendingProfiles) return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        updateProfiles(selectedConsumer.promoModal(pendingProfiles as any[], promoCodes));
-        setPendingProfiles(null);
+        if (!pendingData) return;
+        const rows = pendingData.rows.map((row, i) => ({
+            ...row,
+            'Promo Code': promoCodes[i % promoCodes.length] ?? '',
+        }));
+        loadData(rows, pendingData.columns);
+        setPendingData(null);
+        setStage('idle');
     }
 
     function handlePromoCancel() {
-        if (!pendingProfiles) return;
-        updateProfiles(pendingProfiles);
-        setPendingProfiles(null);
+        if (!pendingData) return;
+        loadData(pendingData.rows, pendingData.columns);
+        setPendingData(null);
+        setStage('idle');
     }
 
     return (
         <>
             <section className="rounded-2xl border border-white/8 bg-[#111111] p-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-sm font-medium text-zinc-400">
-                        Завантажте Excel-файл
-                    </h2>
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={downloadSourceTemplate}
-                    >
+                    <h2 className="text-sm font-medium text-zinc-400">Завантажте Excel-файл</h2>
+                    <Button size="sm" variant="ghost" onClick={downloadSourceTemplate}>
                         <FileDown className="size-4" />
-                        Шаблон файлу
+                        Шаблон
                     </Button>
                 </div>
                 <ExcelUploader onFile={handleFile} disabled={false} />
@@ -71,11 +90,16 @@ export function FileUploaderSection() {
                 )}
             </section>
 
-            {pendingProfiles && (
-                <PromoModal
-                    onConfirm={handlePromoConfirm}
-                    onCancel={handlePromoCancel}
+            {stage === 'password' && pendingData && (
+                <PasswordModal
+                    count={pendingData.rows.length}
+                    onConfirm={handlePasswordConfirm}
+                    onCancel={handlePasswordCancel}
                 />
+            )}
+
+            {stage === 'promo' && pendingData && (
+                <PromoModal onConfirm={handlePromoConfirm} onCancel={handlePromoCancel} />
             )}
         </>
     );
